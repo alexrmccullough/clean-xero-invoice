@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+<script>
+
+//window.onload = function () {
+//  var startTime = new Date();
+//  var appSettings = new AppSettings();
+//  var csvs = importCSVs(appSettings);
+//  var fobjs = csvs.fobjs;
+//  Logger.log("csvs: " + JSON.stringify(csvs));
+//  Logger.log("fobjs: " + JSON.stringify(fobjs));
+//  var filesInfo = [];
+//  
+//  for (var i=0; i<fobjs.length; i++) {
+//    filesInfo.push(
+//      {
+//        name: fobjs[i].getName(),
+//        url: fobjs[i].getUrl()
+//      });
+//  }
+//        
+//  Logger.log('filesInfo: ' + JSON.stringify(filesInfo));
+//  
+//  var tFilesInfo = "";
+//  for (var i=0; i<filesInfo.length; i++) {
+//     var file = filesInfo[i];
+//     tFilesInfo += "<a href=\"" + file.url + "\">" + file.name + "</a>\n";
+//  }
+//  Logger.log("tFilesInfo: " + tFilesInfo);
+//  document.getElementById('input_files').innerHTML = tFilesInfo;
+//}
+
+function runConversion () {
+document.getElementById('working_status').innerHTML = "Working...";
+document.getElementById('result_file_links').innerHTML = "";
+document.getElementById('result_folder_link').innerHTML = ""; 
+ 
+  google.script.run.withSuccessHandler(showConversionSuccess).withFailureHandler(showConversionFailure).go();
+}
+
+function showConversionFailure (error) {
+ var msg = "Conversion FAILED.\n" + error.toString();
+ document.getElementById('working_status').innerHTML= msg;
+}
+
+
+function showConversionSuccess (results) { 
+ var haveErrors = results.haveErrors;
+ 
+ var folderLink = "Output folder ";
+ var fileLinks = "Output files<br>";
+ 
+ var keys = Object.keys(results);
+ var outFolderUrl = results.outFolderUrl;
+ var fileDict = results.files;
+ 
+ folderLink += simpleHref (outFolderUrl, 'here', '<br><br>');
+ 
+ var keys = Object.keys(fileDict);
+ for (var i=0; i<keys.length; i++) {
+     var file = fileDict[keys[i]];
+     fileLinks += simpleHref(file.url, file.name, '<br>');
+  }
+  
+  var sStatus;
+    if(!haveErrors) {
+    sStatus = "Conversion successful.<br>";
+  }
+  else {
+    sStatus = "Conversion FAILED. See Error output to correct errors.<br>";
+  }
+  document.getElementById('working_status').innerHTML = sStatus;
+  document.getElementById('result_file_links').innerHTML = fileLinks;
+  document.getElementById('result_folder_link').innerHTML = folderLink;
+}
+
+function simpleHref (url, name, suffix) {
+   suffix = suffix || "";
+   return "<a href=\"" + url + "\" target=_blank>" + name + "</a>" + suffix;
+}
+</script>
+
+<!--Input CSV files found:-->
+
+<div id="input_files"></div>
+
+<div id="run_button"> 
+<input type="button" value="Convert H2M -> Xero" 
+onclick = "runConversion()" /> 
+</div>
+
+<div id="working_status"></div>
+
+<div id="result_folder_link"></div>
+
+<div id="result_file_links"></div>
+  
+  
+  
+  </body>
+
+</html>
+
+
